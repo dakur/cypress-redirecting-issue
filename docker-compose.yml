@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+    app:
+        image: php:8.2-apache
+
+        volumes:
+            - ./public:/var/www/html
+
+        ports:
+            - "127.0.0.1:8089:80"
+
+    cypress:
+        image: cypress-from-factory
+        working_dir: /cypress
+        volumes:
+            - ./cypress:/cypress
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        tty: true # keep the container running after completing "docker up -d" (ref https://stackoverflow.com/a/55953120/3668474)
+        depends_on: [app]
+        environment:
+            DISPLAY: $DISPLAY # expose X11 envvar
+            NO_PROXY: localhost,127.0.0.1,app # attempt to prevent redirection of http://app according to https://docs.cypress.io/guides/references/proxy-configuration#Proxy-environment-variables
